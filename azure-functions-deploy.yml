@@ -1,32 +1,105 @@
-name: Azure Functions Deploy
+
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+#
+
+name: Build and deploy container app to Azure Web App - trabalhocn
 
 on:
   push:
     branches:
-      - main  # ou a branch que você deseja monitorar
+      - main
+  workflow_dispatch:
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: 'ubuntu-latest'
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
+    - name: Enable Git LFS
+      run: git lfs pull
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
       with:
-        node-version: '14' # Certifique-se de usar a versão correta do Node.js
+        distribution: 'adopt'
+        java-version: '17'
 
-    - name: Install dependencies
-      run: npm install
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-    - name: Archive functions folder
-      run: zip -r functions.zip .
-
-    - name: Deploy to Azure Functions
-      uses: azure/functions-action@v1
+    - name: Log in to registry
+      uses: docker/login-action@v2
       with:
-        app-name: YOUR_FUNCTION_APP_NAME
-        package: functions.zip
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+        registry: https://imagenscontainers.azurecr.io/
+        username: ${{ secrets.AzureAppService_ContainerUsername_1e3b703851744b1ba54457401e7d3f27 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_7f55160ce927416a84e9fd789d0f0d27 }}
+
+    #- name: Build and push container image to registry
+    #  uses: docker/build-push-action@v3
+    #  with:
+    #    push: true
+    #    tags: imagenscontainers.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_1e3b703851744b1ba54457401e7d3f27 }}/demo:${{ github.sha }}
+    #    file: ./Dockerfile
+    
+    - name: Build with Maven
+      run: mvn clean package -DskipTests
+
+    #- name: List contents of target directory
+    #  run: ls -l ..
+
+    #- name: List contents of target directory 2
+    #  run: ls -l .
+
+    #- name: List contents of target directory Target
+    #  run: ls -l target
+
+    #- name: Build and push container image to registry
+    #  uses: docker/build-push-action@v3
+    #  with:
+    #    push: true
+    #    #tags: imagenscontainers.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_1e3b703851744b1ba54457401e7d3f27 }}/demo:latest
+    #    tags: imagenscontainers.azurecr.io/demo:latest
+    #    file: ./Dockerfile
+
+    - name: Build and push container image to registry
+      run: |
+        docker build --no-cache -t imagenscontainers.azurecr.io/demo:latest .
+        docker push imagenscontainers.azurecr.io/demo:latest
+        ls -l target
+
+    - name: Restart Azure Web App
+      run: |
+        az login --username silva.nuno@ipcbcampus.pt --password ${{ secrets.AZURE_CREDENTIALS }}
+        az webapp restart --name trabalhocn --resource-group miniProjeto
+
+    #- name: Dockerize
+    #  run: | 
+    #    docker build -t imagenscontainers.azucr.io/demo:${{ github.sha }} .
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'MiniProjeto2324'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_7a8607a7a22243d5a56dbcf474cb4d65 }}
+        #images: 'imagenscontainers.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_1e3b703851744b1ba54457401e7d3f27 }}/demo:${{ github.sha }}'
+        images: 'imagenscontainers.azurecr.io/demo:latest'
+
+    #- name: Restart Azure App Service
+      #run: az webapp restart --name MiniProjeto2324 --resource-group miniprojeto
+      #env:
+      #  AZURE_WEBAPP_NAME: 'MiniProjeto2324'
+      #  AZURE_RESOURCE_GROUP: 'miniprojeto'
+      #if: always()
