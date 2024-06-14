@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Adicionar Receita</title>
+    <script src=" script.js" defer>
+    </script>
+</head>
+
+<body>
+    <h1>Adicionar Nova Receita</h1>
+    <section class="form-receita">
+        <form action="salvar-receita.html" method="post" enctype="multipart/form-data">
+            <label for="titulo">Título</label>
+            <input type="text" id="titulo" name="titulo" required>
+
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" name="descricao" required></textarea>
+
+            <label for="ingredientes">Ingredientes</label>
+            <textarea id="ingredientes" name="ingredientes" required></textarea>
+
+            <label for="preparo">Modo de Preparo</label>
+            <textarea id="preparo" name="preparo" required></textarea>
+
+            <label for="imagem">Adicionar Imagem</label>
+            <div class="upload-wrapper" onclick="document.getElementById('imagem').click()">
+                <input type="file" id="imagem" name="imagem" accept="image/*" onchange="previewImage(event)">
+                <div class="upload-content">
+                    <img id="preview" src="" alt="Preview" style="display:none;" />
+                    <p id="upload-text">Clique ou arraste a imagem aqui</p>
+                </div>
+            </div>
+
+            <button type="submit" class="btn" onclick="enviarDados()">Salvar Receita</button>
+        </form>
+    </section>
+
+    <hr>
+    <h1>Receitas</h1>
+    <div id="receitas"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const receitasDiv = document.getElementById('receitas');
+
+            const response = await fetch('http://YOUR_FUNCTION_URL/api/GetReceitas');
+            const receitas = await response.json();
+
+            receitas.forEach(receita => {
+                const receitaDiv = document.createElement('div');
+                receitaDiv.classList.add('receita');
+
+                const nome = document.createElement('h2');
+                nome.textContent = receita.nome;
+                receitaDiv.appendChild(nome);
+
+                const ingredientes = document.createElement('p');
+                ingredientes.textContent = `Ingredientes: ${receita.ingredientes.join(', ')}`;
+                receitaDiv.appendChild(ingredientes);
+
+                if (receita.imagem) {
+                    const imagem = document.createElement('img');
+                    imagem.src = receita.imagem;
+                    receitaDiv.appendChild(imagem);
+                }
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Deletar';
+                deleteButton.addEventListener('click', async () => {
+                    await fetch(`http://YOUR_FUNCTION_URL/api/DeletarReceita?id=${receita.id}`, {
+                        method: 'DELETE'
+                    });
+                    location.reload();
+                });
+                receitaDiv.appendChild(deleteButton);
+
+                receitasDiv.appendChild(receitaDiv);
+            });
+        });
+
+        document.getElementById('receitaForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const nome = document.getElementById('nome').value;
+            const ingredientes = document.getElementById('ingredientes').value.split(',');
+            const imagemInput = document.getElementById('imagem').files[0];
+
+            const reader = new FileReader();
+            reader.readAsDataURL(imagemInput);
+
+            reader.onload = async function () {
+                const imagemBase64 = reader.result.split(',')[1];
+
+                const data = {
+                    nome: nome,
+                    ingredientes: ingredientes,
+                    imagem: `data:${imagemInput.type};base64,${imagemBase64}`
+                };
+
+                const response = await fetch('http://YOUR_FUNCTION_URL/api/ProcessarReceita', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Receita adicionada com sucesso!');
+                    location.reload();
+                } else {
+                    alert('Erro ao adicionar receita.');
+                }
+            };
+
+            reader.onerror = function (error) {
+                console.error('Erro ao ler o arquivo:', error);
+            };
+        });
+    </script>
+</body>
+
+</html>
