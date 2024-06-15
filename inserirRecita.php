@@ -15,15 +15,15 @@ $receita = [
 ];
 
 $container->createItem($receita);
-
-if() {
-    echo "<Script> alert('Receita inserida com sucesso!') </script>";
+if ($container->createItem($receita)) {
+    echo "<script>alert('Receita inserida com sucesso!')</script>";
     sleep(3);
     header("Location: index.php");
 } else {
-    echo "<Script> alert('Receita inserida com sucesso!') </script>";
+    echo "<script>alert('Falha ao inserir a receita!')</script>";
     sleep(3);
     header("Location: index.php");
 }
+
 
 ?>
