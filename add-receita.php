@@ -13,7 +13,7 @@
     </header>
     <main>
         <section class="form-receita">
-            <form action="salvar-receita.html" method="post" enctype="multipart/form-data">
+            <form action="inserirRecita.php" method="post" enctype="multipart/form-data">
                 <label for="titulo">Título</label>
                 <input type="text" id="titulo" name="titulo" required>
                 
