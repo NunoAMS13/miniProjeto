@@ -3,7 +3,7 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 #
 
-name: Build and deploy container app to Azure Web App - trabalhocn
+name: Build and deploy container app to Azure Web App - MiniProjeto2324
 
 on:
   push:
@@ -73,7 +73,7 @@ jobs:
     - name: Restart Azure Web App
       run: |
         az login --username silva.nuno@ipcbcampus.pt --password ${{ secrets.AZURE_CREDENTIALS }}
-        az webapp restart --name trabalhocn --resource-group miniProjeto
+        az webapp restart --name MiniProjeto2324 --resource-group miniProjeto
 
     #- name: Dockerize
     #  run: | 
