@@ -3,7 +3,7 @@ RUN apt update
 RUN apt install -y apache2 
 RUN apt install -y apache2-utils 
 RUN apt clean 
-COPY index.php /var/www/html/
+COPY index.html /var/www/html/
 COPY add-receita.php /var/www/html/
 COPY apagarReceita.php /var/www/html/
 COPY conexao.php /var/www/html/
