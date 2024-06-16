@@ -23,14 +23,14 @@ jobs:
       uses: docker/login-action@v2
       with:
         registry: https://miniprojeto.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_e3772eaa74174421a08dce328d006b76 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_a05d80e58dd04d2e86546b250cedae47 }}
+        username: ${{ secrets.AzureAppService_ContainerUsername_63ed24d267fc4af1adc39aab04c9d23c }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_685ac86a294f47d59724899f0ba92271 }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: miniprojeto.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_e3772eaa74174421a08dce328d006b76 }}/contentor:${{ github.sha }}
+        tags: miniprojeto.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_63ed24d267fc4af1adc39aab04c9d23c }}/contentor:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -47,5 +47,5 @@ jobs:
       with:
         app-name: 'MiniProjeto'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_e2c1061a658d48fd8ab3a1766aa68f66 }}
-        images: 'miniprojeto.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_e3772eaa74174421a08dce328d006b76 }}/contentor:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_6701d44df08f463da0c434ec840b98a3 }}
+        images: 'miniprojeto.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_63ed24d267fc4af1adc39aab04c9d23c }}/contentor:${{ github.sha }}'
