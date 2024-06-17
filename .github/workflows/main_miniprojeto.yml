@@ -23,7 +23,7 @@ jobs:
       uses: docker/login-action@v2
       with:
         registry: https://miniprojeto.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_4c052f946efc4bdb855b2dd92c202277 }}
+        username: ${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_4C052F946EFC4BDB855B2DD92C202277 }}
         password: ${{ secrets.AzureAppService_ContainerPassword_2e4e07273d2b4c2b8ef7056abc92294f }}
 
     - name: Build and push container image to registry
