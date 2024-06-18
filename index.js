@@ -123,22 +123,5 @@ app.listen(port, function () {
     console.log(`Example app listening on port ${port}!`);
 });
 
-module.exports = async function (context, myTimer) {
-    if (myTimer.isPastDue) {
-        context.log('A execução da função está atrasada.');
-    }
-
-    try {
-        const { database } = await client.databases.createIfNotExists({ id: databaseId });
-        const { container } = await database.containers.createIfNotExists({ id: containerId });
-        context.log('Conexão com Cosmos DB estabelecida com sucesso.');
-    } catch (error) {
-        context.log.error('Falha ao conectar à Cosmos DB:', error);
-        context.done(error);
-        return;
-    }
-
-    context.done();
-};
 
 
