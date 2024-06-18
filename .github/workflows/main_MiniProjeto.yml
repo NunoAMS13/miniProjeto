@@ -1,7 +1,7 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy container app to Azure Web App - MiniProjeto
+name: Build and deploy dotnet core app to Azure Function App - miniprojeto
 
 on:
   push:
@@ -9,43 +9,44 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
+  DOTNET_VERSION: '8.0.x' # set this to the dotnet version to use
+
 jobs:
-  build:
-    runs-on: 'ubuntu-latest'
+  build-and-deploy:
+    runs-on: windows-latest
+    permissions:
+      id-token: write #This is required for requesting the JWT
 
     steps:
-    - uses: actions/checkout@v2
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v4
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Log in to registry
-      uses: docker/login-action@v2
-      with:
-        registry: https://miniprojeto.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_63ed24d267fc4af1adc39aab04c9d23c }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_685ac86a294f47d59724899f0ba92271 }}
+      - name: 'Resolve Project Dependencies Using Dotnet'
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          dotnet build --configuration Release --output ./output
+          popd
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7843EDD43423426BAE95FEA08D94A189 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_DC8DE3E16E754069B9BFC0D08346EA66 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F8E711E184E9447EAA27C4FB3A28105C }}
 
-    - name: Build and push container image to registry
-      uses: docker/build-push-action@v3
-      with:
-        push: true
-        tags: miniprojeto.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_63ed24d267fc4af1adc39aab04c9d23c }}/contentor:${{ github.sha }}
-        file: ./Dockerfile
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
-    steps:
-    - name: Deploy to Azure Web App
-      id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'MiniProjeto'
-        slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_6701d44df08f463da0c434ec840b98a3 }}
-        images: 'miniprojeto.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_63ed24d267fc4af1adc39aab04c9d23c }}/contentor:${{ github.sha }}'
+      - name: 'Run Azure Functions Action'
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: 'miniprojeto'
+          slot-name: 'Production'
+          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+          
