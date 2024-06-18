@@ -5,7 +5,7 @@ const multer = require('multer');
 const path = require('path');
 
 const endpoint = "https://miniprojeto2324.documents.azure.com:443/";
-const key = "";
+const key = "PA98XhkQ1aIL5n3ICgmj13YDip514b2mXTmEwktqWK7cyIxrIodJz5bqAWQfpjO7oAKr7iLsJMPOACDbtiZQqA==";
 const databaseId = "MiniProjeto";
 const containerId = "Receitas";
 
