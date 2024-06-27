@@ -1,18 +1,16 @@
 var express = require('express')
 const { CosmosClient } = require("@azure/cosmos");
 const bodyParser = require('body-parser');
-const multer = require('multer');
 const path = require('path');
 
 const endpoint = "https://miniprojeto2324.documents.azure.com:443/";
-const key = "TgDfk5R2zuCevwkvEmQxptWyXqm3MIywLSKuZ4OMW5gufa28vCDVsE3wu8QCcM0QYavihKvSsGxGACDbbG4sEQ==";
+const key = "uWeJT9M9nT2ac7l1SlEKT5ZxxPTxKDcrOcR57sKQKxiCEwPcrNn6Z9vzuhvHge7NRYHfVBVXFlYLACDbyBB3zw==";
 const databaseId = "MiniProjeto";
 const containerId = "Receitas";
 
 const client = new CosmosClient({ endpoint, key });
 
 var app = express()
-const upload = multer({ dest: 'uploads/' });
 const port = process.env.PORT || 3000
 
 app.use(express.static('public'));
@@ -46,6 +44,9 @@ app.get('/', async (req, res) => {
             <link rel="stylesheet" href="styles.css">
         </head>
         <body>
+            <header>
+                <a href="http://miniprojeto2324.francecentral.cloudapp.azure.com/" class="btn">Contactos</a>
+            </header>
 
             <main>
                 <section class="intro" style="width: 100%">
@@ -65,7 +66,7 @@ app.get('/', async (req, res) => {
         res.status(500).send('Erro ao recuperar receitas');
     }
 });
-app.use(bodyParser.urlencoded({ extended: true }));
+
 
     app.get('/detalhes-receita/:index', async (req, res) => {
         const index = req.params.index;
@@ -122,6 +123,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.listen(port, function () {
     console.log(`Example app listening on port ${port}!`);
 });
+
 
 
 
