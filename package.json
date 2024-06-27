@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "build": "echo 'Nothing to build'",  // Caso você não tenha um processo de build
+    "test": "echo \"No test specified\" && exit 0"
   },
   "keywords": [],
   "author": "",
