@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "build": "echo 'Nothing to build'",  // Caso você não tenha um processo de build
+    "build": "echo 'Nothing to build'",  
     "test": "echo \"No test specified\" && exit 0"
   },
   "keywords": [],
