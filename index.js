@@ -50,7 +50,7 @@ app.get('/', async (req, res) => {
 
             <main>
                 <section class="intro" style="width: 100%">
-                    <h1>Bem vindo ao nosso site de receitas!</h1>
+                    <h1>Bem vindo ao nosso site de receitas portuguesas!</h1>
                     <p>Aqui você pode visualizar as suas receitas favoritas de maneira fácil e prática. </p>
                 </section>
                 <section class="receitas-lista" style="display: flex;">
